@@ -6,10 +6,6 @@ body {
     min-height: 100%;
     height: 100%;
     font-family: Bad Script;
-    background: #91eae4;
-    /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #91EAE4, #86A8E7, #7F7FD5);
-    /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to bottom, #91EAE4, #86A8E7, #7F7FD5);
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
@@ -42,7 +38,7 @@ input:focus {
     color: #86a8e7;
 }
 
-span.todo-trash {
+span.taskTrash {
     margin-right: 10px;
     text-align: center;
     height: 50px;
@@ -86,7 +82,7 @@ button:hover {
     margin: 2px 4px;
 }
 
-#todo {
+#listList {
     margin: 0 auto;
     box-shadow: 0 0 1em black;
     max-width: 400px;
@@ -126,13 +122,13 @@ button:hover {
     display: block;
 }
 
-.todos {
+.taskReady {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-.todos li {
+.taskReady li {
     background: #f7f7f7;
     height: 50px;
     line-height: 50px;
@@ -140,15 +136,15 @@ button:hover {
     font-size: 20px;
 }
 
-.todos li span.todo-text {
+.taskReady li span.taskText {
     padding: 0 8px;
 }
 
-.todos li:nth-child(2n) {
+.taskReady li:nth-child(2n) {
     background: #edf1f5;
 }
 
-.todos li:hover span.todo-trash {
+.taskReady li:hover span.taskTrash {
     width: 50px;
     opacity: 1.0;
     margin-left: 5px;
@@ -173,7 +169,7 @@ button:hover {
     color: #7f7fd5;
 }
 
-.tips {
+.listTips {
     position: relative;
     top: 20%;
     width: 100%;
@@ -181,7 +177,7 @@ button:hover {
     margin-top: 25px;
 }
 
-/*  if screen size less than 450px, resize tips lists and close btn so they don't overlap */
+/* если размер экрана меньше 450 пикселей, изменить размер списков подсказок и закрыть btn, чтобы они не перекрывались */
 @media screen and (max-height: 450px) {
     .overlay a {
         font-size: 20px
@@ -193,7 +189,7 @@ button:hover {
         right: 35px;
     }
 
-    #todo {
+    #listList {
         width: 100%;
         height: 100%;
     }
