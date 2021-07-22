@@ -1,53 +1,80 @@
+
+//  Капелька глобальных переменных
+
+let tasks = [];
+let text = '';
+let outTask = document.getElementById('taskReady');
+
+/*
+        Подгрузка с хранилища
+ */
+
+//  Если данных сохранненных нет, то заполняем по умолчанию и печатаем.
+//  В ином случае достаем то что есть и тоже печатаем.
 if (localStorage.removeItem("Key") === undefined) {
-    let tasks = [];
-    tasks[0] = [];
+    tasks[0] = [1, 2];
     tasks.push ({
         number: 1,
         task: 'Прокинутися',
         checked: false,
         delete: false
     });
-    tasks.push ({
-        number: 2,
-        task: 'Піти вбитися',
-        checked: false,
-        delete: false
-    });
-
-    let outTask = document.getElementById('task');
-    for (let i = 0; i < tasks.length; i++  ) {
-        text = '<li> <span class = "taskText"> </span>' + tasks[i].number + '. ' + tasks[i].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li> <br>';
-        outTask.innerHTML = text;
-        // работает, но при этом не работает...
+        text = '<li> <span class = "taskText"> </span>' + tasks[1].number + '. ' + tasks[1].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+    outTask.innerHTML = text;
+    text = '';
+    localStorage.setItem('Key', tasks);
+}
+  else {
+    tasks = localStorage.getItem("Key");
+    for (let i = 1; i < tasks.length; i++  ) {
+        text += '<li> <span class = "taskText"> </span>' + tasks[i].number + '. ' + tasks[i].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
     }
-    
-} else {
-    let tasks = localStorage.removeItem("Key");
+    outTask.innerHTML = text;
+    text = '';
 }
 
-//console.log(tasks[0].task);
+/*
+        Сохранение данных в хранилище
+ */
 
+$("#taskSave").click(function() {
+    localStorage.setItem('Key', tasks);
+});
+
+/*
+    Очистка всего списка
+ */
+
+$("#taskClear").click(function() {
+    tasks = [];
+    tasks [0] = [];
+    localStorage.setItem('Key', tasks);
+    outTask.innerHTML = tasks;
+    text = '';
+});
+
+/*
+        Добавление задачи по нажатию ввода
+ */
 
 $(document).keyup(function(e) {
     if (e.key === "Enter" || e.keyCode === 13) {
-        let text = $("input").val();
         //input.value() = ''; почему-то не работать
         tasks.push ({
             number: tasks.length,
-            task: text,
+            task: $("input").val(),
             checked: false,
             delete: false
-        })
+        });
 
-        for (let i = 0; i < tasks.length; i++)
-            console.log(tasks[i].task)
-
-        let outTask = document.getElementById('task');
-        for (let i = 0; i < tasks.length; i++  ) {
-                let num = Number(tasks[i].number)+1;
-                text = '<li> <span class = "taskText"> </span>' + num + '. ' + tasks[i].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li> <br>';
-            outTask.innerHTML = text;
-                // работает, но при этом не работает...
+        for (let i = 0; i < tasks.length; i++) {
+            console.log(tasks[i].number + '. ' + tasks[i].task);
         }
+
+        for (let i = 1; i < tasks.length; i++) {
+                text += '<li> <span class = "taskText"> </span>' + tasks[i].number + '. ' + tasks[i].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+        }
+        outTask.innerHTML = text;
+        text = '';
     }
 });
