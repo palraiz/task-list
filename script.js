@@ -29,14 +29,19 @@ if (localStorage.getItem("Key") === undefined) {
     console.log(localStorage.getItem('Key'));
 }
   else {
+    tasks = JSON.parse(localStorage.getItem("Key"));
       if (tasks.length > 0) {
-          tasks = JSON.parse(localStorage.getItem("Key"));
           for (let i = 1; i < tasks.length; i++) {
               text += '<li> <span class = "taskText"> </span>' + tasks[i].number + '. ' + tasks[i].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
           }
           outTask.innerHTML = text;
           text = '';
-      } else tasks[0] = [];
+      } else {
+          tasks[0] = [];
+          text = '';
+          outTask.innerHTML = text;
+      }
+
 }
 
 /*
@@ -44,8 +49,6 @@ if (localStorage.getItem("Key") === undefined) {
  */
 
 $("#taskSave").click(function() {
-    for (let i = 0; i < tasks.length; i++)
-        localStorage.setItem ("Key", JSON.stringify(tasks[i]));
     localStorage.setItem ("Key", JSON.stringify(tasks));
     console.log(localStorage.getItem('Key'));
 });
@@ -61,6 +64,7 @@ $("#taskSave").click(function() {
  */
 
 $("#taskClear").click(function() {
+    tasks = [];
     tasks[0] = [];
     tasks.push ({
         number: 1,
@@ -69,13 +73,8 @@ $("#taskClear").click(function() {
         delete: false
     });
     text = '<li> <span class = "taskText"> </span>' + tasks[1].number + '. ' + tasks[1].task + '<span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-    outTask.innerHTML = tasks[1].text;
+    outTask.innerHTML = text;
     text = '';
-
-    localStorage.setItem ("Key", JSON.stringify(tasks[0]));
-    localStorage.setItem ("Key", JSON.stringify(tasks[1]));
-    localStorage.setItem ("Key", JSON.stringify(tasks));
-    console.log(localStorage.getItem('Key'));
 });
 
 /*
