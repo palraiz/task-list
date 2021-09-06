@@ -1,9 +1,28 @@
-
 //  Капелька глобальных переменных
 
-let tasks = [];
+let tasks = {'todo':[], delete:[]};
 let text = '';
+let iterator = 0;
 let outTask = document.getElementById('taskReady');
+
+/*
+    Распечатывание нового списка на странице
+ */
+
+function printText(){
+
+    text = '';
+    // после устранения дыры, если такова была, распечатываем список
+    for (let i = 0; i < tasks['todo'].length; i++) {
+        var k=i+1;
+        if (tasks['todo'][i].checked === false) //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
+            text += '<li idTask="'+i+'"> <span class = "taskText">' + k+ '. ' + tasks['todo'][i].title + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+        if (tasks['todo'][i].checked === true) // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
+            text += '<li idTask="'+i+'"> <span class = "taskText checked">' + k+ '. ' + tasks['todo'][i].title + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+    }
+
+    outTask.innerHTML = text;
+}
 
 /*
         Подгрузка с хранилища
@@ -12,33 +31,12 @@ let outTask = document.getElementById('taskReady');
 //  Если данных сохранненных нет, то заполняем по умолчанию и печатаем.
 //  В ином случае достаем то что есть и тоже печатаем.
 if (localStorage.getItem("Key") == null) {
-    tasks[0] = [];
-    tasks.push ({
-        number: 1,
-        task: 'Прокинутися',
-        checked: false,
-        delet: false
-    });
-    text = '<li> <span class = "taskText">' + tasks[1].number + '. ' + tasks[1].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-    outTask.innerHTML = text;
-    text = '';
+    tasks = {'todo':[], 'delete':[]};
+    printText();
 }
-  else {
+else {
     tasks = JSON.parse(localStorage.getItem("Key"));
-      if (tasks && tasks.length > 0) {
-          for (let i = 1; i < tasks.length; i++) {
-              if (tasks[i] !== null) {
-              if (tasks[i].checked === false) //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
-                  text += '<li> <span class = "taskText">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-              if (tasks[i].checked === true) // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
-                  text += '<li> <span class = "checked">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-              console.log(JSON.stringify(tasks));
-          }}
-          outTask.innerHTML = text;
-          text = '';
-      } else {
-          tasks[0] = [];
-      }
+    printText();
 }
 
 /*
@@ -47,7 +45,6 @@ if (localStorage.getItem("Key") == null) {
 
 $("#taskSave").click(function() {
     localStorage.setItem ("Key", JSON.stringify(tasks));
-    console.log(localStorage.getItem('Key'));
 });
 
 /*
@@ -55,17 +52,8 @@ $("#taskSave").click(function() {
  */
 
 $("#taskClear").click(function() {
-    tasks = [];
-    tasks[0] = [];
-    tasks.push ({
-        number: 1,
-        task: 'Прокинутися',
-        checked: false,
-        delete: false
-    });
-    text = '<li> <span class = "taskText">' + tasks[1].number + '. ' + tasks[1].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-    outTask.innerHTML = text;
-    text = '';
+    tasks = {'todo':[], 'delete':[]};
+    printText();
 });
 
 /*
@@ -74,119 +62,86 @@ $("#taskClear").click(function() {
 
 $(document).keyup(function(e) {
     //  Добавляем в конец списка задач содержимое строки ввода
+    //  Если была удалена какая-то задача, то занимается первая пустая ячейка
     if (e.key === "Enter" || e.keyCode === 13) {
-        //input.value() = ''; почему-то не работать
-        if (tasks[tasks.length] !== null)
-            tasks.push({
-                number: tasks.length,
-                task: $("input").val(),
+        if ((tasks.todo.length - 1) == null) {
+            let index = checkTask();
+            tasks.todo[index] = ({
+                title: $("input").val(),
                 checked: false,
-                delet: false
+                delete: false
             });
-    } else
-        tasks[tasks.length] = {
-            number: tasks.length,
-            task: $("input").val(),
+        } else
+        tasks.todo.push({
+            title: $("input").val(),
             checked: false,
-            delet: false
-        }
+            delete: false
+        });
 
-        for (let i = 0; i < tasks.length; i++) {
-            console.log(tasks[i].number + '. ' + tasks[i].task);
-        }
-
-        //  Вывод на страницу обновленный список задач
-        for (let i = 1; i < tasks.length; i++) {
-            if (tasks[i].checked === false) //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
-                text += '<li> <span class = "taskText">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-            if (tasks[i].checked === true) // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
-                text += '<li> <span class = "checked">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-            console.log(JSON.stringify(tasks));
-        }
-        outTask.innerHTML = text;
-        text = '';
+        $("input").val('');
+        printText();
+    }
 });
 
 /*
     Удаление задачи по нажатию корзины
  */
 
-$(".taskTrash").click(function() {
-    //  Считывание номер задачи
-    console.log("delete");
-    text = $(".taskTrash").parent().text();
-    console.log(text);
-    text = Number(text.split('.')[0]);
-    console.log(text);
+$("body").on('click','.taskTrash',function() {
+    let index = $(this).parent().attr('idTask');
+    tasks.delete.push(tasks.todo[index]);
+    console.log(tasks.todo);
+    tasks.todo.splice(index, 1);
+    console.log(tasks.todo);
 
-    //  Пометка задачу как удаленную
-    tasks[text].delet = true;
-    console.log(tasks[text].delet);
 
-    //  Проход по всему списку задач
-    for (let i = 1; i < tasks.length; i++) {
-        console.log(tasks[i].number + '. ' + tasks[i].task);
-        //  Пока не найдется удаленная задача
-        if (tasks[i].delet === true) {
-            //  Перемещается удаленная задача в массив, что находится на нулевой ячейке листа задач
-            tasks[0].push(tasks[i].task);
-            console.log(tasks[0][0]);
-
-            //  Перемещение все задачи от i до tasks.length на позицию назад
-            for (let j = i; j < tasks.length; j++)
-                tasks[j] = tasks[j + 1];
-        }
-
-        if (i === Number(tasks.length)-1)
-            tasks.pop()
-    }
-
-    //  После перемещение удаленного элемента в "корзину", выводим все задачи
-    text = '';
-    for (let i = 1; i < tasks.length; i++) {
-        if (taska[i] !== null) {
-        if (tasks[i].checked === false) //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
-            text += '<li> <span class = "taskText">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-        if (tasks[i].checked === true) // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
-            text += '<li> <span class = "checked">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-        console.log(JSON.stringify(tasks));
-    }}
-
-    console.log(text);
-    outTask.innerHTML = text;
+    printText();
 });
 
 /*
     Зачеркивание задачи по нажатию на нее
  */
 
-$(".taskText").click(function() {
-    //  Считываем номер задачи
-    console.log("checked");
-    text = $(".taskText").parent().text();
-    console.log(text);
-    text = Number(text.split('.')[0]);
-    console.log(text);
+$("body").on('click','.taskText',function() {
+//  Помечаем задачу как сделанную
+    if(tasks.todo[$(this).parent().attr('idTask')].checked)
+        tasks.todo[$(this).parent().attr('idTask')].checked = false;
+    else
+    tasks.todo[$(this).parent().attr('idTask')].checked = true;
 
-    //  Помечаем задачу как сделанную
-    tasks[text].checked = true;
-    console.log(tasks[text].checked);
+    printText();
+});
 
-    text = '';
+$("#taskDelete").click(function() {
+//  Помечаем задачу как сделанную
+    console.log(tasks.delete);
+    let buffer = '<center>' + "Видалені задачі" + '<center>';
 
-    //  Вывод на страницу обновленный список задач
-    for (let i = 1; i < tasks.length; i++) {
-        if (tasks[i].checked === false) //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
-            text += '<li> <span class = "taskText">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-        if (tasks[i].checked === true) // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
-            text += '<li> <span class = "checked">' + tasks[i].number + '. ' + tasks[i].task + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-        console.log(JSON.stringify(tasks));
+    if (iterator === 0) {
+        for (let i = 0; i < tasks.delete.length; i++)
+            buffer += '<li idTask="'+i+'"> <span class = "taskText">' + tasks['delete'][i].title + '</span> <span class = "taskTrashDel"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+
+        outTask.innerHTML = buffer;
+        iterator = 1;
+        return;
+    }
+    if (iterator === 1) {
+        printText();
+        iterator = 0;
+        buffer = '<center>' + "Видалені задачі" + '<center>';
     }
 
-    text = '';
-    });
+});
 
-$(".checked").click(function() {
-    console.log("unchecked");
-    $( "html" ).parents(".taskText");
+$("body").on('click','.taskTrashDel',function() {
+    let index = $(this).parent().attr('idTask');
+    console.log(tasks.delete);
+    tasks.delete.splice(index, 1);
+    console.log(tasks.delete);
+    let buffer = '<center>' + "Видалені задачі" + '<center>';
+    for (let i = 0; i < tasks.delete.length; i++)
+        buffer += '<li idTask="'+i+'"> <span class = "taskText">' + tasks['delete'][i].title  + '</span> <span class = "taskTrashDel"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+
+    outTask.innerHTML = buffer;
+
 });

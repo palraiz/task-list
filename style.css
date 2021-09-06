@@ -175,7 +175,7 @@ button:hover {
     margin-top: 25px;
 }
 
-@media screen and (max-height: 450px) {
+@media screen and (max-height: 700px) {
     .overlay a {
         font-size: 20px
     }
