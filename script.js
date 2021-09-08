@@ -80,7 +80,6 @@ $(document).keyup(function(e) {
 
         $("input").val('');
         printText();
-    }
 });
 
 /*
