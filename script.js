@@ -1,124 +1,66 @@
+
+
+$.ajax({
+    url: 'data.php?action=getAll',
+    type: 'GET',
+    success: function() {console.log("getAll OK")},
+    error: function() {console.log('getAll ERROR')}
+})
+
 //  Капелька глобальных переменных
 
-let tasks = {'todo':[], delete:[]};
+let tasks = {todo:[], delet:[]};
 let text = '';
 let iterator = 0;
+let id = 0;
 let outTask = document.getElementById('taskReady');
 
 /*
-    Распечатывание нового списка на странице
+    printText Распечатывание нового списка на странице
+    taskClear Удаление всего списка
+    taskDelete Показать все удаленные задачи
  */
 
 function printText(){
 
     text = '';
     // после устранения дыры, если такова была, распечатываем список
-    for (let i = 0; i < tasks['todo'].length; i++) {
-        var k=i+1;
-        if (tasks['todo'][i].checked === false) //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
-            text += '<li idTask="'+i+'"> <span class = "taskText">' + k+ '. ' + tasks['todo'][i].title + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-        if (tasks['todo'][i].checked === true) // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
-            text += '<li idTask="'+i+'"> <span class = "taskText checked">' + k+ '. ' + tasks['todo'][i].title + '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+    for (let i = 0; i < tasks.todo.length; i++) {
+        if (tasks.todo[i].checked === false)
+            //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
+            text += '<li idTask="'+i+'"> <span class = "taskText">' + i +'. ' + tasks['todo'][i].title +
+                '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+        if (tasks.todo[i].checked === true)
+            // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
+            text += '<li idTask="'+i+'"> <span class = "taskText checked">' + i +'. ' + tasks.todo[i].title +
+                '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
     }
 
     outTask.innerHTML = text;
 }
 
-/*
-        Подгрузка с хранилища
- */
-
-//  Если данных сохранненных нет, то заполняем по умолчанию и печатаем.
-//  В ином случае достаем то что есть и тоже печатаем.
-if (localStorage.getItem("Key") == null) {
-    tasks = {'todo':[], 'delete':[]};
-    printText();
-}
-else {
-    tasks = JSON.parse(localStorage.getItem("Key"));
-    printText();
-}
-
-/*
-        Сохранение данных в хранилище
- */
-
-$("#taskSave").click(function() {
-    localStorage.setItem ("Key", JSON.stringify(tasks));
-});
-
-/*
-    Очистка всего списка
- */
-
 $("#taskClear").click(function() {
+
     tasks = {'todo':[], 'delete':[]};
-    printText();
-});
 
-/*
-        Добавление задачи по нажатию ввода
- */
-
-$(document).keyup(function(e) {
-    //  Добавляем в конец списка задач содержимое строки ввода
-    //  Если была удалена какая-то задача, то занимается первая пустая ячейка
-    if (e.key === "Enter" || e.keyCode === 13) {
-        if ((tasks.todo.length - 1) == null) {
-            let index = checkTask();
-            tasks.todo[index] = ({
-                title: $("input").val(),
-                checked: false,
-                delete: false
-            });
-        } else
-        tasks.todo.push({
-            title: $("input").val(),
-            checked: false,
-            delete: false
-        });
-
-        $("input").val('');
-        printText();
-});
-
-/*
-    Удаление задачи по нажатию корзины
- */
-
-$("body").on('click','.taskTrash',function() {
-    let index = $(this).parent().attr('idTask');
-    tasks.delete.push(tasks.todo[index]);
-    console.log(tasks.todo);
-    tasks.todo.splice(index, 1);
-    console.log(tasks.todo);
-
-
-    printText();
-});
-
-/*
-    Зачеркивание задачи по нажатию на нее
- */
-
-$("body").on('click','.taskText',function() {
-//  Помечаем задачу как сделанную
-    if(tasks.todo[$(this).parent().attr('idTask')].checked)
-        tasks.todo[$(this).parent().attr('idTask')].checked = false;
-    else
-    tasks.todo[$(this).parent().attr('idTask')].checked = true;
-
+    $.ajax({
+        url: 'data.php?action=clearAll',
+        type: 'GET',
+        success: function() {console.log("clearAll OK")},
+        error: function() {console.log('clearAll ERROR')}
+    })
     printText();
 });
 
 $("#taskDelete").click(function() {
 //  Помечаем задачу как сделанную
-    console.log(tasks.delete);
+    console.log(tasks.delet);
     let buffer = '<center>' + "Видалені задачі" + '<center>';
 
     if (iterator === 0) {
-        for (let i = 0; i < tasks.delete.length; i++)
-            buffer += '<li idTask="'+i+'"> <span class = "taskText">' + tasks['delete'][i].title + '</span> <span class = "taskTrashDel"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+        for (let i = 0; i < tasks.delet.length; i++)
+            buffer += '<li idTask="'+i+'"> <span class = "taskText">' + tasks.delet[i].title +
+                '</span> <span class = "taskTrashDel"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
 
         outTask.innerHTML = buffer;
         iterator = 1;
@@ -132,14 +74,89 @@ $("#taskDelete").click(function() {
 
 });
 
+/*
+    keyup Добавление новой задачи
+    taskTrash Удаление одной задачи
+    taskTrashDel Окончательное удаление задачи
+ */
+
+$(document).keyup(function(e) {
+    if (e.key === "Enter" || e.keyCode === 13) {
+        id++;
+        //  Добавляем в конец списка задач содержимое строки ввода
+        tasks.todo.push({
+            id: id,
+            title: $("input").val(),
+            checked: false,
+            delet: false
+        });
+
+        $.ajax({
+            url: 'data.php?action=addNewTask',
+            type: 'POST',
+            data: {data: $("input").val()},
+            dataType: 'json',
+            success: function (res) {console.log(res);},
+            error: function () {console.log('ERROR');}
+        })
+
+        $("input").val('');
+        printText();
+    }
+});
+
+$("body").on('click','.taskTrash',function() {
+    let index = $(this).parent().attr('idTask');
+    $.ajax({
+        url: 'data.php?action=deletTask',
+        type: 'POST',
+        data: {data: tasks.todo[index].id},
+        dataType: 'json',
+        success: function (res) {console.log(res);},
+        error: function () {console.log('ERROR');}
+    })
+
+    tasks.delet.push(tasks.todo[index]);
+    tasks.todo.splice(index, 1);
+    printText();
+});
+
+$("body").on('click','.taskText',function() {
+    let index = $(this).parent().attr('idTask');
+//  Помечаем задачу как сделанную
+    if(tasks.todo[index].checked)
+        tasks.todo[index].checked = false;
+    else
+        tasks.todo[index].checked = true;
+
+    $.ajax({
+        url: 'data.php?action=checkedTask',
+        type: 'POST',
+        data: {data: tasks.todo[index].id},
+        dataType: 'json',
+        success: function (res) {console.log(res);},
+        error: function () {console.log('ERROR');}
+    })
+
+    printText();
+});
+
 $("body").on('click','.taskTrashDel',function() {
     let index = $(this).parent().attr('idTask');
-    console.log(tasks.delete);
-    tasks.delete.splice(index, 1);
-    console.log(tasks.delete);
+    $.ajax({
+        url: 'data.php?action=redelTask',
+        type: 'POST',
+        data: {data: tasks.delet[index].id},
+        dataType: 'json',
+        success: function (res) {console.log(res);},
+        error: function () {console.log('ERROR');}
+    })
+
+    tasks.delet.splice(index, 1);
     let buffer = '<center>' + "Видалені задачі" + '<center>';
-    for (let i = 0; i < tasks.delete.length; i++)
-        buffer += '<li idTask="'+i+'"> <span class = "taskText">' + tasks['delete'][i].title  + '</span> <span class = "taskTrashDel"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
+    for (let i = 0; i < tasks.delet.length; i++)
+        buffer += '<li idTask="'+i+'"> <span class = "taskText">' + tasks.delet[i].title  +
+            '</span> <span class = "taskTrashDel"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
 
     outTask.innerHTML = buffer;
 
