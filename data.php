@@ -43,12 +43,11 @@ if ($action == 'addNewTask'){
 if ($action == 'checkedTask'){
     if (isset($_POST['data']) && $_POST['data'] != '') {
         $data = $_POST['data'];
-        $query = "SELECT checked FROM tasks;";
+        $query = "SELECT checked FROM tasks WHERE id = $data;";
         $result = mysqli_query($connect, $query);
         $result = mysqli_fetch_array($result);
-        echo json_encode([$result]);
 
-        if ($result == 0) $query = "UPDATE tasks SET checked ='1' WHERE id = $data";
+        if ($result['checked'] == 0) $query = "UPDATE tasks SET checked ='1' WHERE id = $data";
         else $query = "UPDATE tasks SET checked ='0' WHERE id = $data";
 
         $result = mysqli_query($connect, $query);
@@ -58,11 +57,11 @@ if ($action == 'checkedTask'){
 if ($action == 'deletTask'){
     if (isset($_POST['data']) && $_POST['data'] != '') {
         $data = $_POST['data'];
-        $query = "SELECT delet FROM tasks;";
+        $query = "SELECT delet FROM tasks WHERE id = $data;";
         $result = mysqli_query($connect, $query);
         $result = mysqli_fetch_array($result);
 
-        if ($result == 0) $query = "UPDATE tasks SET delet ='1' WHERE id = $data";
+        if ($result['delet'] == 0) $query = "UPDATE tasks SET delet ='1' WHERE id = $data";
         else $query = "UPDATE tasks SET delet ='0' WHERE id = $data";
 
         $result = mysqli_query($connect, $query);
