@@ -3,21 +3,21 @@
 let outTask = document.getElementById('taskReady');
 let tasks = {todo:[], delet:[]};
 
-function printText(){
+function printText() {
     let text = '';
     // после устранения дыры, если такова была, распечатываем список
-    if (iterator === 0) {
+    if (iterator == 0) {
     for (let i = 0; i < tasks.todo.length; i++) {
-        if (tasks.todo[i].checked == false)
+        if (tasks.todo[i].checked == 0)
         //  Если задача не была почечена, то добавление в отображаемый список обычную задачу
             text += '<li idTask="'+i+'"> <span class = "taskText">' + i +'. ' + tasks['todo'][i].title +
                 '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
-        if (tasks.todo[i].checked == true)
+        if (tasks.todo[i].checked == 1)
         // Если задача была почечена, то добавление в отображаемый список зачеркнутую задачу
             text += '<li idTask="'+i+'"> <span class = "taskText checked">' + i +'. ' + tasks.todo[i].title +
                 '</span> <span class = "taskTrash"> <i class = "fas fa-trash-alt"> </i> </span> </li>';
     }}
-    if (iterator === 1) {
+    if (iterator == 1) {
         text = '<center>' + "Видалені задачі" + '<center>';
         for (let i = 0; i < tasks.delet.length; i++)
             text += '<li idTask="'+i+'"> <span class = "deletText">' + tasks.delet[i].title +
@@ -151,7 +151,7 @@ $("body").on('click','.taskTrash',function() {
 $("body").on('click','.taskText',function() {
     let index = $(this).parent().attr('idTask');
 //  Помечаем задачу как сделанную
-    if(tasks.todo[index].checked)
+    if (tasks.todo[index].checked == 1)
         tasks.todo[index].checked = 0;
     else
         tasks.todo[index].checked = 1;
