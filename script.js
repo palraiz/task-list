@@ -1,5 +1,6 @@
 
-
+let iterator = 0;
+let id = 0;
 let outTask = document.getElementById('taskReady');
 let tasks = {todo:[], delet:[]};
 
@@ -44,7 +45,8 @@ function PHPtoJS(res) {
             });
         }
     }
-    console.log(tasks);
+    id = res[0][res[0].length-1].id;
+    console.log(id);
     printText()
 }
 
@@ -62,8 +64,7 @@ $.ajax({
 //  Капелька глобальных переменных
 
 
-let iterator = 0;
-let id = 0;
+
 
 
 /*
@@ -109,7 +110,18 @@ $("#taskDelete").click(function() {
 
 $(document).keyup(function(e) {
     if (e.key === "Enter" || e.keyCode === 13) {
-        id++;
+        $.ajax({
+            url: 'data.php?action=addNewTask',
+            type: 'POST',
+            data: {data: $("input").val()},
+            dataType: 'json',
+            success: function (res) {
+                id = res[0][0];
+                console.log(id);
+                },
+            error: function () {console.log('ERROR');}
+        })
+
         //  Добавляем в конец списка задач содержимое строки ввода
         tasks.todo.push({
             id: id,
@@ -117,15 +129,6 @@ $(document).keyup(function(e) {
             checked: 0,
             delet: 0
         });
-
-        $.ajax({
-            url: 'data.php?action=addNewTask',
-            type: 'POST',
-            data: {data: $("input").val()},
-            dataType: 'json',
-            success: function (res) {console.log(res);},
-            error: function () {console.log('ERROR');}
-        })
 
         $("input").val('');
         printText();

@@ -34,10 +34,14 @@ if ($action=='clearAll'){
 if ($action == 'addNewTask'){
     if (isset($_POST['data']) && $_POST['data'] != '') {
         $data = $_POST['data'];
-        $query = "INSERT INTO tasks(title) VALUES ('$data');";
+        $query = "INSERT INTO tasks(title) VALUES ('$data') ;";
         $result = mysqli_query($connect, $query);
 
-        echo json_encode(['Title' => $data]);
+        $query = "SELECT id FROM tasks ORDER BY id DESC;";
+        $result = mysqli_query($connect, $query);
+
+        $id = mysqli_fetch_array($result);
+        echo json_encode([$id]);
     }}
 
 if ($action == 'checkedTask'){
